@@ -1,0 +1,482 @@
+/* ===== ESTILOS UNIFICADOS PARA LOGIN E CADASTRO ===== */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #2E8B57;
+    --primary-dark: #1F5F3F;
+    --secondary-color: #c6c8c8;
+    --text-dark: #2C3E50;
+    --text-light: #7F8C8D;
+    --background-light: #F8F9FA;
+    --white: #FFFFFF;
+    --accent-color: #FF6B6B;
+    --gradient-primary: linear-gradient(135deg, #7d8a83 0%, #48B973 100%);
+    --gradient-secondary: linear-gradient(135deg, #F0A500 0%, #FFB84D 100%);
+    --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --shadow-large: 0 20px 40px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 30px rgba(46, 139, 87, 0.2);
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background: linear-gradient(135deg, var(--background-light) 0%, rgba(46, 139, 87, 0.05) 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://img.icons8.com/fluency-systems-regular/48/000000/paw.png') repeat;
+    opacity: 0.03;
+    z-index: -1;
+    animation: backgroundFloat 20s ease-in-out infinite;
+}
+
+@keyframes backgroundFloat {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(10px, 10px); }
+}
+
+/* Header Styles */
+.petcare-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(46, 139, 87, 0.1);
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.petcare-logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    gap: 0.5rem;
+}
+
+.petcare-logo-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+    transition: var(--transition);
+}
+
+.petcare-logo:hover .petcare-logo-img {
+    transform: scale(1.1) rotate(5deg);
+    border-color: var(--secondary-color);
+}
+
+.petcare-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    transition: var(--transition);
+}
+
+.petcare-back-btn:hover {
+    color: var(--primary-color);
+    background: rgba(46, 139, 87, 0.1);
+    transform: translateX(-3px);
+}
+
+/* Container Styles */
+.petcare-container {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    max-width: 600px;
+    width: 100%;
+    margin-top: 70px;
+    box-shadow: var(--shadow-light);
+    animation: slideInScale 0.5s ease-out;
+}
+
+@keyframes slideInScale {
+    from { opacity: 0; transform: scale(0.95) translateY(-20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.petcare-header-content {
+    text-align: center;
+    margin-bottom: 1.2rem;
+}
+
+.petcare-header-content h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.petcare-header-content p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    max-width: 320px;
+    margin: 0.4rem auto 0;
+}
+
+/* Form Styles */
+.petcare-form {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.petcare-form-section {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.petcare-field-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+}
+
+.petcare-input-group {
+    position: relative;
+}
+
+.petcare-input-group label {
+    position: absolute;
+    left: 10px;
+    top: -7px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-light);
+    background: var(--white);
+    padding: 0 5px;
+    transition: var(--transition);
+}
+
+.petcare-input-group i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+
+.petcare-input-group input,
+.petcare-input-group select {
+    width: 100%;
+    padding: 0.6rem 0.6rem 0.6rem 32px;
+    border: 2px solid rgba(52, 199, 89, 0.15);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: var(--white);
+    transition: var(--transition);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.petcare-input-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%237F8C8D'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+}
+
+.petcare-input-group input:focus,
+.petcare-input-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.petcare-input-group input:focus + i,
+.petcare-input-group select:focus + i {
+    color: var(--primary-color);
+}
+
+.petcare-password-group .petcare-toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+
+.petcare-password-group .petcare-toggle-password:hover {
+    color: var(--primary-color);
+}
+
+.petcare-password-strength {
+    display: none;
+    margin-top: 0.2rem;
+    height: 4px;
+    background: rgba(52, 199, 89, 0.15);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.petcare-password-strength-fill {
+    height: 100%;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.petcare-strength-weak { width: 25%; background: var(--accent-color); }
+.petcare-strength-fair { width: 50%; background: #FBBF24; }
+.petcare-strength-good { width: 75%; background: #10B981; }
+.petcare-strength-strong { width: 100%; background: var(--primary-dark); }
+
+.petcare-password-strength-text {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: 0.2rem;
+    text-align: center;
+}
+
+/* Button Styles */
+.petcare-btn {
+    width: 100%;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--gradient-primary);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    box-shadow: var(--shadow-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.petcare-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.petcare-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.4s ease;
+}
+
+.petcare-btn:hover::before {
+    left: 100%;
+}
+
+.petcare-google-btn {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    background: var(--white);
+    color: var(--text-dark);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    box-shadow: var(--shadow-light);
+}
+
+.petcare-google-btn:hover {
+    border-color: #4285f4;
+    background: #f8f9fa;
+    box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.petcare-google-btn img {
+    width: 16px;
+    height: 16px;
+}
+
+/* Divider and Link Styles */
+.petcare-divider {
+    text-align: center;
+    margin: 0.8rem 0;
+    position: relative;
+}
+
+.petcare-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(52, 199, 89, 0.15);
+}
+
+.petcare-divider span {
+    background: var(--white);
+    padding: 0 0.8rem;
+    color: var(--text-light);
+    font-size: 0.8rem;
+    position: relative;
+    z-index: 2;
+}
+
+.petcare-link {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin-top: 0.8rem;
+}
+
+.petcare-link a {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.petcare-link a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Validation Styles */
+.petcare-input-group.valid input,
+.petcare-input-group.valid select {
+    border-color: var(--primary-color);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2334C759'%3e%3cpath d='M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+}
+
+.petcare-input-group.invalid input,
+.petcare-input-group.invalid select {
+    border-color: var(--accent-color);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23FF6B6B'%3e%3cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3e%3cpath d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+}
+
+.petcare-error-message {
+    color: var(--accent-color);
+    font-size: 0.75rem;
+    margin-top: 0.2rem;
+    display: none;
+    font-weight: 500;
+}
+
+.petcare-input-group.invalid .petcare-error-message {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Toast Notification */
+.petcare-toast {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    color: var(--white);
+    font-weight: 500;
+    z-index: 10000;
+    animation: slideInRight 0.3s ease;
+    box-shadow: var(--shadow-light);
+    max-width: 280px;
+    font-size: 0.85rem;
+}
+
+.petcare-toast.success { background: var(--primary-color); }
+.petcare-toast.error { background: var(--accent-color); }
+.petcare-toast.info { background: #3B82F6; }
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOutRight {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(100%); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body { padding: 10px; }
+    .petcare-header { padding: 0.6rem 1rem; }
+    .petcare-container {
+        padding: 1.2rem 0.8rem;
+        margin-top: 60px;
+        max-width: 100%;
+    }
+    .petcare-header-content h1 { font-size: 1.3rem; }
+    .petcare-header-content p { font-size: 0.8rem; }
+    .petcare-field-pair {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+    }
+    .petcare-input-group input,
+    .petcare-input-group select { font-size: 0.8rem; padding: 0.5rem 0.5rem 0.5rem 28px; }
+    .petcare-input-group i { font-size: 0.8rem; left: 8px; }
+    .petcare-input-group select { background-position: right 8px center; background-size: 9px; }
+    .petcare-btn, .petcare-google-btn { font-size: 0.85rem; padding: 0.6rem; }
+}
+
+@media (max-width: 480px) {
+    .petcare-container { padding: 1rem 0.6rem; }
+    .petcare-header-content h1 { font-size: 1.2rem; }
+    .petcare-header-content p { font-size: 0.75rem; }
+    .petcare-input-group input,
+    .petcare-input-group select { font-size: 0.75rem; padding: 0.4rem 0.4rem 0.4rem 24px; }
+    .petcare-input-group i { font-size: 0.75rem; }
+    .petcare-btn, .petcare-google-btn { font-size: 0.8rem; padding: 0.5rem; }
+}
