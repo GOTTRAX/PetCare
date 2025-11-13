@@ -407,7 +407,7 @@ if (count($nomes) >= 2) {
                                     <!-- FOTO DO ANIMAL -->
                                     <div class="animal-photo-small">
                                         <?php if (!empty($agendamento['animal_foto'])): ?>
-                                            <img src="../uploads/pets/<?= htmlspecialchars($agendamento['animal_foto']) ?>" 
+                                            <img src="../../assets/uploads/pets/<?= htmlspecialchars($agendamento['animal_foto']) ?>" 
                                                  alt="<?= htmlspecialchars($agendamento['animal_nome']) ?>" 
                                                  class="animal-img-small">
                                         <?php else: ?>
@@ -556,7 +556,7 @@ if (count($nomes) >= 2) {
             const photoContainer = document.getElementById('modal_animal_photo');
             if (agendamento.animal_foto) {
                 photoContainer.innerHTML = `
-                    <img src="../uploads/pets/${agendamento.animal_foto}" 
+                    <img src="../../assets/uploads/pets/${agendamento.animal_foto}" 
                          alt="${agendamento.animal_nome}" 
                          class="animal-img-large">
                 `;
