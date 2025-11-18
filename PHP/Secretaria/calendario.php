@@ -1,11 +1,8 @@
 <?php
 /**
  * Calendário da Secretária
- * Este arquivo é um wrapper que inclui o calendário unificado
- * 
- * Coloque este arquivo em: /Bruno/PetCare/PHP/Secretaria/calendario.php
+ * Este arquivo é um wrapper que inclui o calendário unificad
  */
 
-// Incluir o calendário unificado
 include '../Calendario/Calendario.php';
 ?>

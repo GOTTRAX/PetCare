@@ -1347,7 +1347,7 @@ function getInitials($nome) {
                                         <td><?= htmlspecialchars($row['tipo_usuario']) ?></td>
                                         <td><?= htmlspecialchars($row['genero'] ?? '-') ?></td>
                                         <td>
-                                            <a href="../animais.php?usuario_id=<?= (int) $row['id'] ?>" class="badge warning">
+                                            <a href="../Vet/animais.php?usuario_id=<?= (int) $row['id'] ?>" class="badge warning">
                                                 <i class="fas fa-paw"></i> <?= (int) $row['total_animais'] ?>
                                             </a>
                                         </td>

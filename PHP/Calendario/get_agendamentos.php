@@ -1,12 +1,8 @@
 <?php
-// Initialize session and database connection
 session_start();
 include '../conexao.php';
-
-// Set JSON header
 header('Content-Type: application/json');
 
-// Validate user session
 if (!isset($_SESSION['id'])) {
     http_response_code(401);
     echo json_encode(['error' => 'Usuário não autenticado']);
@@ -77,19 +73,19 @@ try {
         
         switch (strtolower($appt['status'])) {
             case 'confirmado':
-                $backgroundColor = '#10b981'; // verde
+                $backgroundColor = '#10b981'; 
                 $borderColor = '#10b981';
                 break;
             case 'cancelado':
-                $backgroundColor = '#ef4444'; // vermelho
+                $backgroundColor = '#ef4444'; 
                 $borderColor = '#ef4444';
                 break;
             case 'pendente':
-                $backgroundColor = '#f59e0b'; // laranja
+                $backgroundColor = '#f59e0b'; 
                 $borderColor = '#f59e0b';
                 break;
             case 'finalizado':
-                $backgroundColor = '#64748b'; // cinza
+                $backgroundColor = '#64748b'; 
                 $borderColor = '#64748b';
                 break;
         }
