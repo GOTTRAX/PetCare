@@ -2,10 +2,8 @@
 include("../conexao.php");
 $paginaTitulo = "Gerenciamento de Usuários";
 
-// Enable PDO error reporting for debugging
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// =================== AÇÕES (POST) ===================
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"])) {
     $acao = $_POST["acao"];
     $params = [
@@ -14,8 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"])) {
         ":telefone" => trim($_POST["telefone"] ?? ''),
         ":email" => trim($_POST["email"] ?? ''),
         ":tipo" => $_POST["tipo_usuario"] ?? '',
-        ":genero" => $_POST["genero"] ?? '',
-        ":descricao" => trim($_POST["descricao"] ?? '')
+        ":genero" => $_POST["genero"] ?? ''
     ];
 
     try {
@@ -24,30 +21,75 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"])) {
                 header("Location: " . $_SERVER['PHP_SELF'] . "?error=Campos obrigatórios não preenchidos");
                 exit;
             }
-            $sql = "INSERT INTO Usuarios (nome, cpf, telefone, email, senha_hash, tipo_usuario, genero, descricao, ativo) 
-                    VALUES (:nome, :cpf, :telefone, :email, :senha, :tipo, :genero, :descricao, :ativo)";
+
+            // Validação de CPF
+            $cpf = preg_replace('/[^0-9]/', '', $params[":cpf"]);
+            if (strlen($cpf) != 11) {
+                header("Location: " . $_SERVER['PHP_SELF'] . "?error=CPF inválido");
+                exit;
+            }
+
+            // Validação de telefone
+            if (!empty($params[":telefone"])) {
+                $telefone = preg_replace('/[^0-9]/', '', $params[":telefone"]);
+                if (strlen($telefone) < 10 || strlen($telefone) > 11) {
+                    header("Location: " . $_SERVER['PHP_SELF'] . "?error=Telefone inválido");
+                    exit;
+                }
+            }
+
+            // Validação de senha
+            $senha = trim($_POST["senha"] ?? '');
+            if (empty($senha)) {
+                header("Location: " . $_SERVER['PHP_SELF'] . "?error=Senha é obrigatória");
+                exit;
+            }
+            if (strlen($senha) < 6) {
+                header("Location: " . $_SERVER['PHP_SELF'] . "?error=Senha deve ter no mínimo 6 caracteres");
+                exit;
+            }
+
+            $sql = "INSERT INTO Usuarios (nome, cpf, telefone, email, senha_hash, tipo_usuario, genero, ativo) 
+                    VALUES (:nome, :cpf, :telefone, :email, :senha, :tipo, :genero, :ativo)";
             $stmt = $pdo->prepare($sql);
-            $params[":senha"] = password_hash("123456", PASSWORD_DEFAULT);
+            $params[":senha"] = password_hash($senha, PASSWORD_DEFAULT);
             $params[":ativo"] = isset($_POST["ativo"]) ? 1 : 0;
             $stmt->execute($params);
         }
 
         if ($acao === "editar") {
-            $params[":id"] = (int)($_POST["id"] ?? 0);
+            $params[":id"] = (int) ($_POST["id"] ?? 0);
             if (empty($params[":id"]) || empty($params[":nome"]) || empty($params[":cpf"]) || empty($params[":email"]) || empty($params[":tipo"])) {
                 header("Location: " . $_SERVER['PHP_SELF'] . "?error=Campos obrigatórios não preenchidos");
                 exit;
             }
+
+            // Validação de CPF
+            $cpf = preg_replace('/[^0-9]/', '', $params[":cpf"]);
+            if (strlen($cpf) != 11) {
+                header("Location: " . $_SERVER['PHP_SELF'] . "?error=CPF inválido");
+                exit;
+            }
+
+            // Validação de telefone
+            if (!empty($params[":telefone"])) {
+                $telefone = preg_replace('/[^0-9]/', '', $params[":telefone"]);
+                if (strlen($telefone) < 10 || strlen($telefone) > 11) {
+                    header("Location: " . $_SERVER['PHP_SELF'] . "?error=Telefone inválido");
+                    exit;
+                }
+            }
+
             $sql = "UPDATE Usuarios 
                     SET nome=:nome, cpf=:cpf, telefone=:telefone, email=:email, 
-                        tipo_usuario=:tipo, genero=:genero, descricao=:descricao, atualizado_em=NOW()
+                        tipo_usuario=:tipo, genero=:genero, atualizado_em=NOW()
                     WHERE id=:id";
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
         }
 
         if ($acao === "deletar") {
-            $id = (int)($_POST["id"] ?? 0);
+            $id = (int) ($_POST["id"] ?? 0);
             if (empty($id)) {
                 header("Location: " . $_SERVER['PHP_SELF'] . "?error=ID inválido");
                 exit;
@@ -57,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"])) {
         }
 
         if ($acao === "toggleAtivo") {
-            $id = (int)($_POST["id"] ?? 0);
+            $id = (int) ($_POST["id"] ?? 0);
             if (empty($id)) {
                 header("Location: " . $_SERVER['PHP_SELF'] . "?error=ID inválido");
                 exit;
@@ -67,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"])) {
         }
 
         if ($acao === "bloquear") {
-            $id = (int)($_POST["id"] ?? 0);
+            $id = (int) ($_POST["id"] ?? 0);
             $duracao = $_POST["duracao"] ?? "indefinido";
             if (empty($id)) {
                 header("Location: " . $_SERVER['PHP_SELF'] . "?error=ID inválido");
@@ -91,7 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"])) {
         }
 
         if ($acao === "desbloquear") {
-            $id = (int)($_POST["id"] ?? 0);
+            $id = (int) ($_POST["id"] ?? 0);
             if (empty($id)) {
                 header("Location: " . $_SERVER['PHP_SELF'] . "?error=ID inválido");
                 exit;
@@ -108,11 +150,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"])) {
     }
 }
 
-// =================== AJAX (GET - Relatório de Usuário) ===================
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'relatorio' && isset($_GET['id'])) {
-    $id = (int)($_GET['id'] ?? 0);
+    $id = (int) ($_GET['id'] ?? 0);
     try {
-        $stmt = $pdo->prepare("SELECT id, nome, email, tipo_usuario, genero, descricao, ativo, bloqueado_ate, ultimo_login, criado, atualizado_em 
+        $stmt = $pdo->prepare("SELECT id, nome, email, tipo_usuario, genero, ativo, bloqueado_ate, ultimo_login, criado, atualizado_em 
                                FROM Usuarios WHERE id = :id");
         $stmt->execute([":id" => $id]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -160,23 +201,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'relatorio' && isset($_GET['id']))
                 </div>
             </div>
 
-            <?php if (!empty($usuario["descricao"])): ?>
-                <div class="detail-section">
-                    <h4><i class="fas fa-align-left"></i> Descrição</h4>
-                    <p><?= nl2br(htmlspecialchars($usuario["descricao"])) ?></p>
-                </div>
-            <?php endif; ?>
-
             <div class="detail-section">
                 <h4><i class="fas fa-info-circle"></i> Informações Adicionais</h4>
                 <div class="detail-grid">
                     <div class="detail-item">
                         <span class="detail-label">Bloqueado até</span>
-                        <span class="detail-value"><?= $usuario["bloqueado_ate"] ? htmlspecialchars($usuario["bloqueado_ate"]) : "N/A" ?></span>
+                        <span
+                            class="detail-value"><?= $usuario["bloqueado_ate"] ? htmlspecialchars($usuario["bloqueado_ate"]) : "N/A" ?></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Último login</span>
-                        <span class="detail-value"><?= $usuario["ultimo_login"] ? htmlspecialchars($usuario["ultimo_login"]) : "Nunca" ?></span>
+                        <span
+                            class="detail-value"><?= $usuario["ultimo_login"] ? htmlspecialchars($usuario["ultimo_login"]) : "Nunca" ?></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Criado em</span>
@@ -243,7 +279,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'relatorio' && isset($_GET['id']))
     exit;
 }
 
-// =================== FILTROS E PAGINAÇÃO (GET) ===================
 $where = [];
 $params = [];
 
@@ -272,9 +307,8 @@ if (!empty($_GET['genero'])) {
     $params[':genero'] = $_GET['genero'];
 }
 
-// Paginação
 $itens_por_pagina = 10;
-$pagina_atual = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
+$pagina_atual = isset($_GET['pagina']) ? max(1, (int) $_GET['pagina']) : 1;
 $offset = ($pagina_atual - 1) * $itens_por_pagina;
 
 $sql_count = "SELECT COUNT(*) as total FROM Usuarios u";
@@ -286,7 +320,7 @@ $stmt_count->execute($params);
 $total_registros = $stmt_count->fetch(PDO::FETCH_ASSOC)['total'];
 $total_paginas = ceil($total_registros / $itens_por_pagina);
 
-$sql = "SELECT u.id, u.nome, u.cpf, u.telefone, u.email, u.tipo_usuario, u.genero, u.descricao,
+$sql = "SELECT u.id, u.nome, u.cpf, u.telefone, u.email, u.tipo_usuario, u.genero,
                u.ativo, u.bloqueado_ate, u.ultimo_login, u.criado, u.atualizado_em,
                COUNT(a.id) AS total_animais
         FROM Usuarios u
@@ -300,12 +334,11 @@ $stmt = $pdo->prepare($sql);
 foreach ($params as $key => $value) {
     $stmt->bindValue($key, $value);
 }
-$stmt->bindValue(':limit', (int)$itens_por_pagina, PDO::PARAM_INT);
-$stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+$stmt->bindValue(':limit', (int) $itens_por_pagina, PDO::PARAM_INT);
+$stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
 $stmt->execute();
 $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Contar usuários ativos e inativos
 $stmt_stats = $pdo->query("SELECT 
     COUNT(*) as total,
     SUM(CASE WHEN ativo = 1 THEN 1 ELSE 0 END) as ativos,
@@ -313,7 +346,6 @@ $stmt_stats = $pdo->query("SELECT
     FROM Usuarios");
 $stats = $stmt_stats->fetch(PDO::FETCH_ASSOC);
 
-// =================== DADOS PARA GRÁFICOS ===================
 $sexoData = $pdo->query("SELECT genero, COUNT(*) AS total FROM Usuarios WHERE genero IS NOT NULL GROUP BY genero")->fetchAll(PDO::FETCH_ASSOC);
 $tipoData = $pdo->query("SELECT tipo_usuario, COUNT(*) AS total FROM Usuarios WHERE tipo_usuario IS NOT NULL GROUP BY tipo_usuario")->fetchAll(PDO::FETCH_ASSOC);
 $animaisData = $pdo->query("SELECT u.nome, COUNT(a.id) AS total 
@@ -324,11 +356,10 @@ $animaisData = $pdo->query("SELECT u.nome, COUNT(a.id) AS total
                             ORDER BY total DESC
                             LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
 
-// =================== INCLUIR HEADER ===================
 include 'header.php';
 
-// Função para gerar iniciais do nome
-function getInitials($nome) {
+function getInitials($nome)
+{
     $words = explode(' ', trim($nome));
     if (count($words) >= 2) {
         return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
@@ -339,12 +370,14 @@ function getInitials($nome) {
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $paginaTitulo ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
@@ -384,27 +417,25 @@ function getInitials($nome) {
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa; /* Base white color */
+            background-color: #f8f9fa;
             background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm28-65c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm23-11c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm-6 60c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm35 35c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zM73 10c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm-27 8c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zM32 63c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm57 0c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm-68-30c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm0 16c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm-28 29c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4z" fill="%23e5e7eb" fill-opacity="0.1" fill-rule="evenodd"/%3E%3C/svg%3E');
             background-repeat: repeat;
             min-height: 100vh;
             color: var(--gray-900);
         }
 
-        /* Main Content */
         .main-content {
-            margin-left: 100px; /* Reduced from 280px to shift content left */
-            padding: 32px 16px 32px 32px; /* Reduced right padding to 16px */
+            margin-left: 100px;
+            padding: 32px 16px 32px 32px;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px; /* Reduced from 1400px to prevent content from touching right edge */
-            margin-left: 0; /* Align container to the left */
+            max-width: 1200px;
+            margin-left: 0;
             margin-right: auto;
         }
 
-        /* Page Header */
         .page-header {
             background: var(--white);
             border-radius: var(--border-radius);
@@ -446,7 +477,6 @@ function getInitials($nome) {
             font-weight: 600;
         }
 
-        /* Error Message */
         .error-message {
             background: #fee2e2;
             border-left: 4px solid var(--danger);
@@ -464,7 +494,6 @@ function getInitials($nome) {
             font-size: 20px;
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -563,7 +592,6 @@ function getInitials($nome) {
             color: var(--warning);
         }
 
-        /* Charts Section */
         .charts-section {
             background: var(--white);
             border-radius: var(--border-radius);
@@ -603,7 +631,6 @@ function getInitials($nome) {
             max-height: 250px;
         }
 
-        /* Filters Card */
         .filters-card {
             background: var(--white);
             border-radius: var(--border-radius);
@@ -635,6 +662,37 @@ function getInitials($nome) {
             align-items: end;
         }
 
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-grid-full {
+            grid-column: 1 / -1;
+        }
+
+        .form-section {
+            margin-bottom: 24px;
+        }
+
+        .form-section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section-title i {
+            color: var(--primary);
+            font-size: 16px;
+        }
+
         .form-group {
             display: flex;
             flex-direction: column;
@@ -650,10 +708,20 @@ function getInitials($nome) {
             gap: 6px;
         }
 
+        .form-group label i {
+            color: var(--primary);
+            font-size: 13px;
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
         .form-group input,
         .form-group select,
         .form-group textarea {
-            padding: 10px 14px;
+            padding: 12px 14px;
             border: 2px solid var(--gray-200);
             border-radius: 8px;
             font-size: 14px;
@@ -674,9 +742,90 @@ function getInitials($nome) {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: var(--gray-50);
         }
 
-        /* Buttons */
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: var(--gray-300);
+        }
+
+        .form-group small {
+            font-size: 11px;
+            color: var(--gray-500);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-group small i {
+            font-size: 10px;
+            color: var(--info);
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle input {
+            padding-right: 45px;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            bottom: 2px;
+            width: 40px;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 6px;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle-btn:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: 2px solid var(--gray-200);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-group:hover {
+            background: var(--gray-100);
+            border-color: var(--gray-300);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
         .btn {
             padding: 10px 20px;
             border: none;
@@ -740,7 +889,6 @@ function getInitials($nome) {
             flex-wrap: wrap;
         }
 
-        /* Table Card */
         .table-card {
             background: var(--white);
             border-radius: var(--border-radius);
@@ -797,6 +945,7 @@ function getInitials($nome) {
             border-bottom: 1px solid var(--gray-200);
             font-size: 14px;
             color: var(--gray-900);
+            white-space: nowrap;
         }
 
         tbody tr {
@@ -890,7 +1039,6 @@ function getInitials($nome) {
             font-size: 12px;
         }
 
-        /* Pagination */
         .pagination {
             padding: 20px 32px;
             border-top: 1px solid var(--gray-200);
@@ -913,7 +1061,6 @@ function getInitials($nome) {
             gap: 8px;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -999,7 +1146,6 @@ function getInitials($nome) {
             background: var(--white);
         }
 
-        /* User Details in Modal */
         .usuario-details {
             color: var(--gray-900);
         }
@@ -1063,7 +1209,6 @@ function getInitials($nome) {
             font-size: 14px;
         }
 
-        /* Radio buttons in modal */
         .form-group input[type="radio"] {
             width: auto;
             margin-right: 8px;
@@ -1074,7 +1219,6 @@ function getInitials($nome) {
             margin-right: 8px;
         }
 
-        /* Responsive */
         @media (max-width: 1024px) {
             .main-content {
                 margin-left: 0;
@@ -1107,6 +1251,10 @@ function getInitials($nome) {
                 grid-template-columns: 1fr;
             }
 
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
             .charts-grid {
                 grid-template-columns: 1fr;
             }
@@ -1119,7 +1267,8 @@ function getInitials($nome) {
                 font-size: 13px;
             }
 
-            th, td {
+            th,
+            td {
                 padding: 12px 16px;
             }
 
@@ -1168,6 +1317,7 @@ function getInitials($nome) {
         }
     </style>
 </head>
+
 <body>
     <div class="main-content">
         <div class="container">
@@ -1178,7 +1328,6 @@ function getInitials($nome) {
                 </div>
             <?php endif; ?>
 
-            <!-- Page Header -->
             <div class="page-header">
                 <div class="page-title">
                     <h1><i class="fas fa-users"></i> Gerenciamento de Usuários</h1>
@@ -1190,7 +1339,6 @@ function getInitials($nome) {
                 </button>
             </div>
 
-            <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-card primary">
                     <div class="stat-content">
@@ -1238,7 +1386,6 @@ function getInitials($nome) {
                 </div>
             </div>
 
-            <!-- Charts Section -->
             <div class="charts-section">
                 <h2><i class="fas fa-chart-pie"></i> Estatísticas</h2>
                 <div class="charts-grid">
@@ -1254,7 +1401,6 @@ function getInitials($nome) {
                 </div>
             </div>
 
-            <!-- Filters -->
             <div class="filters-card">
                 <div class="filters-header">
                     <h2><i class="fas fa-filter"></i> Filtros de Pesquisa</h2>
@@ -1262,26 +1408,32 @@ function getInitials($nome) {
                 <form method="GET" class="filters-form">
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Nome</label>
-                        <input type="text" name="nome" placeholder="Digite o nome" value="<?= htmlspecialchars($_GET['nome'] ?? '') ?>">
+                        <input type="text" name="nome" placeholder="Digite o nome"
+                            value="<?= htmlspecialchars($_GET['nome'] ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-id-card"></i> CPF</label>
-                        <input type="text" name="cpf" placeholder="Digite o CPF" value="<?= htmlspecialchars($_GET['cpf'] ?? '') ?>">
+                        <input type="text" name="cpf" placeholder="Digite o CPF"
+                            value="<?= htmlspecialchars($_GET['cpf'] ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-phone"></i> Telefone</label>
-                        <input type="text" name="telefone" placeholder="Digite o telefone" value="<?= htmlspecialchars($_GET['telefone'] ?? '') ?>">
+                        <input type="text" name="telefone" placeholder="Digite o telefone"
+                            value="<?= htmlspecialchars($_GET['telefone'] ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-envelope"></i> E-mail</label>
-                        <input type="email" name="email" placeholder="Digite o e-mail" value="<?= htmlspecialchars($_GET['email'] ?? '') ?>">
+                        <input type="email" name="email" placeholder="Digite o e-mail"
+                            value="<?= htmlspecialchars($_GET['email'] ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-user-tag"></i> Tipo</label>
                         <select name="tipo_usuario">
                             <option value="">Todos</option>
                             <?php foreach (["Cliente", "Veterinario", "Secretaria", "Cuidador"] as $t): ?>
-                                <option value="<?= $t ?>" <?= (($_GET['tipo_usuario'] ?? '') == $t) ? "selected" : "" ?>><?= $t ?></option>
+                                <option value="<?= $t ?>" <?= (($_GET['tipo_usuario'] ?? '') == $t) ? "selected" : "" ?>>
+                                    <?= $t ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -1290,7 +1442,8 @@ function getInitials($nome) {
                         <select name="genero">
                             <option value="">Todos</option>
                             <?php foreach (["Masculino", "Feminino", "Outro"] as $g): ?>
-                                <option value="<?= $g ?>" <?= (($_GET['genero'] ?? '') == $g) ? "selected" : "" ?>><?= $g ?></option>
+                                <option value="<?= $g ?>" <?= (($_GET['genero'] ?? '') == $g) ? "selected" : "" ?>><?= $g ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -1300,20 +1453,21 @@ function getInitials($nome) {
                         </button>
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-secondary" onclick="window.location.href='<?= $_SERVER['PHP_SELF'] ?>'">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="window.location.href='<?= $_SERVER['PHP_SELF'] ?>'">
                             <i class="fas fa-eraser"></i> Limpar
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Table -->
             <?php if (!empty($usuarios)): ?>
                 <div class="table-card">
                     <div class="table-header">
                         <h2><i class="fas fa-table"></i> Lista de Usuários</h2>
                         <span class="pagination-info">
-                            Exibindo <?= $offset + 1 ?> a <?= min($offset + $itens_por_pagina, $total_registros) ?> de <?= $total_registros ?>
+                            Exibindo <?= $offset + 1 ?> a <?= min($offset + $itens_por_pagina, $total_registros) ?> de
+                            <?= $total_registros ?>
                         </span>
                     </div>
                     <div class="table-container">
@@ -1347,7 +1501,8 @@ function getInitials($nome) {
                                         <td><?= htmlspecialchars($row['tipo_usuario']) ?></td>
                                         <td><?= htmlspecialchars($row['genero'] ?? '-') ?></td>
                                         <td>
-                                            <a href="../Vet/animais.php?usuario_id=<?= (int) $row['id'] ?>" class="badge warning">
+                                            <a href="../Vet/animais.php?usuario_id=<?= (int) $row['id'] ?>"
+                                                class="badge warning">
                                                 <i class="fas fa-paw"></i> <?= (int) $row['total_animais'] ?>
                                             </a>
                                         </td>
@@ -1363,25 +1518,34 @@ function getInitials($nome) {
                                         </td>
                                         <td>
                                             <div class="action-buttons">
-                                                <button type="button" class="btn btn-primary btn-sm" onclick="abrirRelatorio(<?= (int) $row['id'] ?>)" title="Ver detalhes">
+                                                <button type="button" class="btn btn-primary btn-sm"
+                                                    onclick="abrirRelatorio(<?= (int) $row['id'] ?>)" title="Ver detalhes">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-success btn-sm" onclick="abrirEdicao(<?= (int) $row['id'] ?>, '<?= addslashes($row['nome']) ?>', '<?= addslashes($row['cpf']) ?>', '<?= addslashes($row['telefone'] ?? '') ?>', '<?= addslashes($row['email']) ?>', '<?= addslashes($row['tipo_usuario']) ?>', '<?= addslashes($row['genero'] ?? '') ?>', '<?= addslashes($row['descricao'] ?? '') ?>')" title="Editar">
+                                                <button type="button" class="btn btn-success btn-sm"
+                                                    onclick="abrirEdicao(<?= (int) $row['id'] ?>, '<?= addslashes($row['nome']) ?>', '<?= addslashes($row['cpf']) ?>', '<?= addslashes($row['telefone'] ?? '') ?>', '<?= addslashes($row['email']) ?>', '<?= addslashes($row['tipo_usuario']) ?>', '<?= addslashes($row['genero'] ?? '') ?>')"
+                                                    title="Editar">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <form method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?')">
+                                                <form method="POST" style="display:inline;"
+                                                    onsubmit="return confirm('Tem certeza que deseja excluir este usuário?')">
                                                     <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
-                                                    <button type="submit" name="acao" value="deletar" class="btn btn-danger btn-sm" title="Excluir">
+                                                    <button type="submit" name="acao" value="deletar"
+                                                        class="btn btn-danger btn-sm" title="Excluir">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
-                                                <button type="button" class="btn btn-warning btn-sm" onclick="abrirBloqueio(<?= (int) $row['id'] ?>)" title="Bloquear">
+                                                <button type="button" class="btn btn-warning btn-sm"
+                                                    onclick="abrirBloqueio(<?= (int) $row['id'] ?>)" title="Bloquear">
                                                     <i class="fas fa-lock"></i>
                                                 </button>
                                                 <form method="POST" style="display:inline;">
                                                     <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
-                                                    <button type="submit" name="acao" value="toggleAtivo" class="btn btn-secondary btn-sm" title="<?= $row['ativo'] ? 'Desativar' : 'Ativar' ?>">
-                                                        <i class="fas <?= $row['ativo'] ? 'fa-user-slash' : 'fa-user-check' ?>"></i>
+                                                    <button type="submit" name="acao" value="toggleAtivo"
+                                                        class="btn btn-secondary btn-sm"
+                                                        title="<?= $row['ativo'] ? 'Desativar' : 'Ativar' ?>">
+                                                        <i
+                                                            class="fas <?= $row['ativo'] ? 'fa-user-slash' : 'fa-user-check' ?>"></i>
                                                     </button>
                                                 </form>
                                             </div>
@@ -1396,10 +1560,14 @@ function getInitials($nome) {
                             Página <?= $pagina_atual ?> de <?= $total_paginas ?>
                         </div>
                         <div class="pagination-buttons">
-                            <button class="btn btn-secondary btn-sm" onclick="window.location.href='<?= $_SERVER['PHP_SELF'] . '?' . http_build_query(array_merge($_GET, ['pagina' => $pagina_atual - 1])) ?>'" <?= $pagina_atual <= 1 ? 'disabled' : '' ?>>
+                            <button class="btn btn-secondary btn-sm"
+                                onclick="window.location.href='<?= $_SERVER['PHP_SELF'] . '?' . http_build_query(array_merge($_GET, ['pagina' => $pagina_atual - 1])) ?>'"
+                                <?= $pagina_atual <= 1 ? 'disabled' : '' ?>>
                                 <i class="fas fa-chevron-left"></i> Anterior
                             </button>
-                            <button class="btn btn-secondary btn-sm" onclick="window.location.href='<?= $_SERVER['PHP_SELF'] . '?' . http_build_query(array_merge($_GET, ['pagina' => $pagina_atual + 1])) ?>'" <?= $pagina_atual >= $total_paginas ? 'disabled' : '' ?>>
+                            <button class="btn btn-secondary btn-sm"
+                                onclick="window.location.href='<?= $_SERVER['PHP_SELF'] . '?' . http_build_query(array_merge($_GET, ['pagina' => $pagina_atual + 1])) ?>'"
+                                <?= $pagina_atual >= $total_paginas ? 'disabled' : '' ?>>
                                 Próximo <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
@@ -1431,49 +1599,132 @@ function getInitials($nome) {
             <form method="POST">
                 <div class="modal-body">
                     <input type="hidden" name="acao" value="adicionar">
-                    <div class="filters-form">
-                        <div class="form-group">
-                            <label><i class="fas fa-user"></i> Nome Completo *</label>
-                            <input type="text" name="nome" placeholder="Nome completo" required>
+
+                    <!-- Seção: Dados Pessoais -->
+                    <div class="form-section">
+                        <h4 class="form-section-title">
+                            <i class="fas fa-user"></i>
+                            Dados Pessoais
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-user"></i>
+                                    Nome Completo
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" name="nome" placeholder="Digite o nome completo" required>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-id-card"></i>
+                                    CPF
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" name="cpf" id="cpf_add" placeholder="000.000.000-00" maxlength="14"
+                                    required>
+                                <small><i class="fas fa-info-circle"></i> Apenas números (11 dígitos)</small>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-id-card"></i> CPF *</label>
-                            <input type="text" name="cpf" placeholder="000.000.000-00" required>
+                    </div>
+
+                    <!-- Seção: Contato -->
+                    <div class="form-section">
+                        <h4 class="form-section-title">
+                            <i class="fas fa-address-book"></i>
+                            Informações de Contato
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-phone"></i>
+                                    Telefone
+                                </label>
+                                <input type="text" name="telefone" id="telefone_add" placeholder="(00) 00000-0000"
+                                    maxlength="15">
+                                <small><i class="fas fa-info-circle"></i> Celular ou telefone fixo</small>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-envelope"></i>
+                                    E-mail
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="email" name="email" placeholder="email@exemplo.com" required>
+                                <small><i class="fas fa-info-circle"></i> Será usado para login</small>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-phone"></i> Telefone</label>
-                            <input type="text" name="telefone" placeholder="(00) 00000-0000">
+                    </div>
+
+                    <!-- Seção: Acesso -->
+                    <div class="form-section">
+                        <h4 class="form-section-title">
+                            <i class="fas fa-lock"></i>
+                            Dados de Acesso
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-key"></i>
+                                    Senha
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="password-toggle">
+                                    <input type="password" name="senha" id="senha_add" placeholder="Mínimo 6 caracteres"
+                                        required minlength="6">
+                                    <button type="button" class="password-toggle-btn"
+                                        onclick="togglePassword('senha_add', this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <small><i class="fas fa-info-circle"></i> Mínimo de 6 caracteres</small>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-user-tag"></i>
+                                    Tipo de Usuário
+                                    <span class="required">*</span>
+                                </label>
+                                <select name="tipo_usuario" required>
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="Cliente">Cliente</option>
+                                    <option value="Veterinario">Veterinário</option>
+                                    <option value="Secretaria">Secretaria</option>
+                                    <option value="Cuidador">Cuidador</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-envelope"></i> E-mail *</label>
-                            <input type="email" name="email" placeholder="email@exemplo.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-user-tag"></i> Tipo *</label>
-                            <select name="tipo_usuario" required>
-                                <option value="">Selecione</option>
-                                <?php foreach (["Cliente", "Veterinario", "Secretaria", "Cuidador"] as $t): ?>
-                                    <option value="<?= $t ?>"><?= $t ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-venus-mars"></i> Gênero</label>
-                            <select name="genero">
-                                <option value="">Selecione</option>
-                                <?php foreach (["Masculino", "Feminino", "Outro"] as $g): ?>
-                                    <option value="<?= $g ?>"><?= $g ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label><i class="fas fa-align-left"></i> Descrição</label>
-                            <textarea name="descricao" placeholder="Descrição opcional"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" name="ativo" checked> Usuário ativo
-                            </label>
+                    </div>
+
+                    <!-- Seção: Informações Adicionais -->
+                    <div class="form-section">
+                        <h4 class="form-section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Informações Adicionais
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-venus-mars"></i>
+                                    Gênero
+                                </label>
+                                <select name="genero">
+                                    <option value="">Selecione</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Feminino">Feminino</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-toggle-on"></i>
+                                    Status da Conta
+                                </label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" name="ativo" id="ativo_add" checked>
+                                    <label for="ativo_add">Ativar usuário após cadastro</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1502,43 +1753,92 @@ function getInitials($nome) {
                 <div class="modal-body">
                     <input type="hidden" name="acao" value="editar">
                     <input type="hidden" name="id" id="edit_id">
-                    <div class="filters-form">
-                        <div class="form-group">
-                            <label><i class="fas fa-user"></i> Nome Completo *</label>
-                            <input type="text" name="nome" id="edit_nome" required>
+
+                    <!-- Seção: Dados Pessoais -->
+                    <div class="form-section">
+                        <h4 class="form-section-title">
+                            <i class="fas fa-user"></i>
+                            Dados Pessoais
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-user"></i>
+                                    Nome Completo
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" name="nome" id="edit_nome" required>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-id-card"></i>
+                                    CPF
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" name="cpf" id="edit_cpf" maxlength="14" required>
+                                <small><i class="fas fa-info-circle"></i> Apenas números (11 dígitos)</small>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-id-card"></i> CPF *</label>
-                            <input type="text" name="cpf" id="edit_cpf" required>
+                    </div>
+
+                    <!-- Seção: Contato -->
+                    <div class="form-section">
+                        <h4 class="form-section-title">
+                            <i class="fas fa-address-book"></i>
+                            Informações de Contato
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-phone"></i>
+                                    Telefone
+                                </label>
+                                <input type="text" name="telefone" id="edit_telefone" maxlength="15">
+                                <small><i class="fas fa-info-circle"></i> Celular ou telefone fixo</small>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-envelope"></i>
+                                    E-mail
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="email" name="email" id="edit_email" required>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-phone"></i> Telefone</label>
-                            <input type="text" name="telefone" id="edit_telefone">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-envelope"></i> E-mail *</label>
-                            <input type="email" name="email" id="edit_email" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-user-tag"></i> Tipo *</label>
-                            <select name="tipo_usuario" id="edit_tipo" required>
-                                <?php foreach (["Cliente", "Veterinario", "Secretaria", "Cuidador"] as $t): ?>
-                                    <option value="<?= $t ?>"><?= $t ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-venus-mars"></i> Gênero</label>
-                            <select name="genero" id="edit_genero">
-                                <option value="">Selecione</option>
-                                <?php foreach (["Masculino", "Feminino", "Outro"] as $g): ?>
-                                    <option value="<?= $g ?>"><?= $g ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label><i class="fas fa-align-left"></i> Descrição</label>
-                            <textarea name="descricao" id="edit_descricao"></textarea>
+                    </div>
+
+                    <!-- Seção: Tipo e Gênero -->
+                    <div class="form-section">
+                        <h4 class="form-section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Informações Adicionais
+                        </h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-user-tag"></i>
+                                    Tipo de Usuário
+                                    <span class="required">*</span>
+                                </label>
+                                <select name="tipo_usuario" id="edit_tipo" required>
+                                    <option value="Cliente">Cliente</option>
+                                    <option value="Veterinario">Veterinário</option>
+                                    <option value="Secretaria">Secretaria</option>
+                                    <option value="Cuidador">Cuidador</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-venus-mars"></i>
+                                    Gênero
+                                </label>
+                                <select name="genero" id="edit_genero">
+                                    <option value="">Selecione</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Feminino">Feminino</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1585,12 +1885,12 @@ function getInitials($nome) {
                 <div class="modal-body">
                     <input type="hidden" name="acao" value="bloquear">
                     <input type="hidden" name="id" id="bloqueioUserId">
-                    
+
                     <p style="margin-bottom: 20px; color: var(--gray-700);">
                         <i class="fas fa-info-circle" style="color: var(--warning);"></i>
                         Escolha a duração do bloqueio:
                     </p>
-                    
+
                     <div class="filters-form" style="grid-template-columns: 1fr;">
                         <div class="form-group">
                             <label style="font-weight: 500; cursor: pointer;">
@@ -1609,7 +1909,8 @@ function getInitials($nome) {
                         </div>
                         <div class="form-group">
                             <label style="font-weight: 500; cursor: pointer;">
-                                <input type="radio" name="duracao" value="indefinido" checked> Indeterminado (desativar conta)
+                                <input type="radio" name="duracao" value="indefinido" checked> Indeterminado (desativar
+                                conta)
                             </label>
                         </div>
                     </div>
@@ -1628,6 +1929,60 @@ function getInitials($nome) {
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Máscaras de CPF e Telefone
+        function mascaraCPF(input) {
+            let valor = input.value.replace(/\D/g, '');
+            valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+            valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+            valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            input.value = valor;
+        }
+
+        function mascaraTelefone(input) {
+            let valor = input.value.replace(/\D/g, '');
+            if (valor.length <= 10) {
+                valor = valor.replace(/(\d{2})(\d)/, '($1) $2');
+                valor = valor.replace(/(\d{4})(\d)/, '$1-$2');
+            } else {
+                valor = valor.replace(/(\d{2})(\d)/, '($1) $2');
+                valor = valor.replace(/(\d{5})(\d)/, '$1-$2');
+            }
+            input.value = valor;
+        }
+
+        // Aplicar máscaras nos campos
+        document.getElementById('cpf_add').addEventListener('input', function () {
+            mascaraCPF(this);
+        });
+
+        document.getElementById('telefone_add').addEventListener('input', function () {
+            mascaraTelefone(this);
+        });
+
+        document.getElementById('edit_cpf').addEventListener('input', function () {
+            mascaraCPF(this);
+        });
+
+        document.getElementById('edit_telefone').addEventListener('input', function () {
+            mascaraTelefone(this);
+        });
+
+        // Toggle de senha
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         // Dados dos gráficos
         const dadosSexo = <?= json_encode($sexoData) ?>;
         const dadosTipos = <?= json_encode($tipoData) ?>;
@@ -1770,13 +2125,13 @@ function getInitials($nome) {
             const alvo = document.getElementById('relatorioDados');
             alvo.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--gray-500);"><i class="fas fa-spinner fa-spin" style="font-size: 32px;"></i><p style="margin-top: 16px;">Carregando...</p></div>';
             abrirModal('modalRelatorio');
-            
-            fetch(`<?= basename($_SERVER['PHP_SELF']) ?>?ajax=relatorio&id=` + userId, { 
-                credentials: 'same-origin' 
+
+            fetch(`<?= basename($_SERVER['PHP_SELF']) ?>?ajax=relatorio&id=` + userId, {
+                credentials: 'same-origin'
             })
-            .then(r => r.text())
-            .then(html => alvo.innerHTML = html)
-            .catch(() => alvo.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i><span>Erro ao carregar relatório.</span></div>');
+                .then(r => r.text())
+                .then(html => alvo.innerHTML = html)
+                .catch(() => alvo.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i><span>Erro ao carregar relatório.</span></div>');
         }
 
         function abrirBloqueio(userId) {
@@ -1784,7 +2139,7 @@ function getInitials($nome) {
             abrirModal('modalBloqueio');
         }
 
-        function abrirEdicao(id, nome, cpf, telefone, email, tipo, genero, descricao) {
+        function abrirEdicao(id, nome, cpf, telefone, email, tipo, genero) {
             document.getElementById('edit_id').value = id;
             document.getElementById('edit_nome').value = nome;
             document.getElementById('edit_cpf').value = cpf;
@@ -1792,12 +2147,11 @@ function getInitials($nome) {
             document.getElementById('edit_email').value = email;
             document.getElementById('edit_tipo').value = tipo;
             document.getElementById('edit_genero').value = genero;
-            document.getElementById('edit_descricao').value = descricao;
             abrirModal('formEdit');
         }
 
         // Fechar modal ao clicar fora
-        window.addEventListener('click', function(e) {
+        window.addEventListener('click', function (e) {
             if (e.target.classList.contains('modal')) {
                 e.target.classList.remove('active');
                 document.body.style.overflow = 'auto';
@@ -1805,7 +2159,7 @@ function getInitials($nome) {
         });
 
         // Fechar modal com ESC
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
                 document.body.style.overflow = 'auto';
@@ -1813,4 +2167,5 @@ function getInitials($nome) {
         });
     </script>
 </body>
+
 </html>

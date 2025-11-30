@@ -3,7 +3,6 @@ session_start();
 $base_path = "/Bruno/PetCare/";
 include "conexao.php";
 
-// Permitir acesso público - não redirecionar
 $usuario_logado = isset($_SESSION['id']);
 $usuario_id = $_SESSION['id'] ?? null;
 $tipo = $_SESSION['tipo_usuario'] ?? null;
@@ -481,7 +480,6 @@ include "header.php";
                         alt="Castração veterinária"
                         class="service-image">
 
-                    <!-- Cards informativos abaixo da imagem -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
                         <div style="background: white; padding: 1.5rem; border-radius: 8px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
                             <div style="font-size: 2.5rem; color: #2E8B57; margin-bottom: 0.5rem;">
@@ -500,7 +498,6 @@ include "header.php";
                         </div>
                     </div>
 
-                    <!-- Card de destaque -->
                     <div style="background: linear-gradient(135deg, #2E8B57 0%, #1F5F3F 100%); padding: 1.5rem; border-radius: 8px; margin-top: 1rem; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
                         <div style="font-size: 2rem; color: white; margin-bottom: 0.5rem;">
                             <i class="fas fa-hand-holding-heart"></i>
@@ -567,7 +564,6 @@ include "header.php";
             </div>
         </section>
 
-        <!-- Seção de Benefícios de Saúde -->
         <section class="full-width-section" style="background: #F8F9FA;">
             <h2 style="text-align: center; color: #2C3E50; font-size: 2.5rem; margin-bottom: 1rem;">
                 Benefícios para a Saúde do seu Pet
@@ -611,7 +607,6 @@ include "header.php";
             </div>
         </section>
 
-        <!-- Seção do Processo Cirúrgico -->
         <section class="full-width-section">
             <h2 style="text-align: center; color: #2C3E50; font-size: 2.5rem; margin-bottom: 1rem;">
                 Como Funciona o Procedimento
@@ -663,7 +658,6 @@ include "header.php";
             </div>
         </section>
 
-        <!-- Seção de Idade Recomendada -->
         <section class="full-width-section" style="background: #F8F9FA;">
             <h2 style="text-align: center; color: #2C3E50; font-size: 2.5rem; margin-bottom: 1rem;">
                 Idade Ideal para Castração
@@ -711,7 +705,6 @@ include "header.php";
             </div>
         </section>
 
-        <!-- Seção de Cuidados Pós-Cirúrgicos -->
         <section class="full-width-section">
             <h2 style="text-align: center; color: #2C3E50; font-size: 2.5rem; margin-bottom: 1rem;">
                 Cuidados Pós-Castração
@@ -775,7 +768,6 @@ include "header.php";
             </div>
         </section>
 
-        <!-- Seção de FAQ -->
         <section class="full-width-section">
             <h2 style="text-align: center; color: #2C3E50; font-size: 2.5rem; margin-bottom: 1rem;">
                 Perguntas Frequentes
@@ -907,12 +899,9 @@ include "header.php";
                     const faqItem = this.parentElement;
                     const answer = this.nextElementSibling;
                     
-                    // Toggle active state
                     this.classList.toggle('active');
                     answer.classList.toggle('active');
                     
-                    // Opcional: Fechar outras perguntas abertas (accordion exclusivo)
-                    // Comente as linhas abaixo se quiser permitir múltiplas abertas
                     faqQuestions.forEach(otherQuestion => {
                         if (otherQuestion !== this) {
                             otherQuestion.classList.remove('active');

@@ -1,10 +1,7 @@
 <?php
 include "conexao.php";
 
-// Definir base_path no início
 $base_path = '/Bruno/PetCare/';
-
-// Verificar login
 $isLogged = isset($_SESSION['id']);
 
 // Inicializar variáveis de menu ativo
@@ -32,7 +29,8 @@ if (isset($_GET['aba'])) {
             $perfil_active = 'active';
     }
 }
-// Processar nome do usuário
+
+
 $abbreviatedName = '';
 if ($isLogged && isset($_SESSION['nome'])) {
     $nameParts = explode(' ', $_SESSION['nome']);
@@ -43,6 +41,8 @@ if ($isLogged && isset($_SESSION['nome'])) {
         }
     }
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -88,9 +88,11 @@ if ($isLogged && isset($_SESSION['nome'])) {
                         </div>
                     </li>
                     <!-- Itens que aparecem se NÃO estiver logado -->
+
                 <?php else: ?>
                     <li><a href="<?php echo $base_path; ?>PHP/login.php">Login</a></li>
                 <?php endif; ?>
+                
             </ul>
         </nav>
     </header>

@@ -3,7 +3,6 @@ session_start();
 $base_path = "/Bruno/PetCare/";
 include "conexao.php";
 
-// Permitir acesso público - não redirecionar
 $usuario_logado = isset($_SESSION['id']);
 $usuario_id = $_SESSION['id'] ?? null;
 $tipo = $_SESSION['tipo_usuario'] ?? null;
@@ -846,7 +845,7 @@ include "header.php";
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Navbar scroll effect
+            
             const header = document.querySelector('header');
             const navbar = document.querySelector('.navbar');
             
@@ -862,7 +861,7 @@ include "header.php";
                 }
             });
 
-            // Smooth scroll for internal links
+            
             const internalLinks = document.querySelectorAll('a[href^="#"]');
             internalLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -880,7 +879,6 @@ include "header.php";
                 });
             });
 
-            // FAQ interactivity
             const faqItems = document.querySelectorAll('.faq-item');
             faqItems.forEach(item => {
                 const question = item.querySelector('h3');
@@ -889,7 +887,6 @@ include "header.php";
                 question.addEventListener('click', function() {
                     const isOpen = item.classList.contains('active');
                     
-                    // Close all other FAQ items
                     faqItems.forEach(otherItem => {
                         if (otherItem !== item) {
                             otherItem.classList.remove('active');
@@ -899,7 +896,6 @@ include "header.php";
                         }
                     });
                     
-                    // Toggle current FAQ item
                     if (!isOpen) {
                         item.classList.add('active');
                         answer.style.maxHeight = answer.scrollHeight + 'px';

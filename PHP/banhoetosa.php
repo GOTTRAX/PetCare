@@ -1,6 +1,6 @@
 <?php
 session_start();
-$base_path = "../"; // raiz do projeto
+$base_path = "../"; 
 include $base_path . "PHP/conexao.php";
 include $base_path . "PHP/header.php";
 ?>
@@ -15,16 +15,12 @@ include $base_path . "PHP/header.php";
     <meta name="author" content="PetCare">
     <title>Banho e Tosa - PetCare</title>
 
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="<?= $base_path ?>assets/img/favicon.png">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- CSS Principal -->
     <link rel="stylesheet" href="<?= $base_path ?>Estilos/styles.css">
 
-    <!-- Estilo específico da página -->
     <style>
         /* HERO */
         .hero-servico {
@@ -437,7 +433,6 @@ include $base_path . "PHP/header.php";
 
 <body>
     <main>
-        <!-- HERO -->
         <section class="hero-servico" aria-labelledby="hero-title">
             <div>
                 <h1 id="hero-title">Banho e Tosa</h1>
@@ -445,11 +440,9 @@ include $base_path . "PHP/header.php";
             </div>
         </section>
 
-        <!-- CONTEÚDO PRINCIPAL -->
         <section class="servico-content">
             <div class="container-narrow">
 
-                <!-- TÍTULO PRINCIPAL CRIATIVO -->
                 <div class="main-title">
                     <h2>Banho e Tosa na PetCare</h2>
                     <i class="fas fa-sparkles icon-sparkle"></i>
@@ -458,7 +451,6 @@ include $base_path . "PHP/header.php";
                     Nossas unidades em São Paulo oferecem serviços de banho e tosa realizados por profissionais qualificados, utilizando produtos seguros e técnicas que garantem o conforto e bem-estar do seu pet.
                 </p>
 
-                <!-- TIPOS DE SERVIÇOS -->
                 <div class="grid-3">
                     <div class="card-icon">
                         <i class="fas fa-shower"></i>
@@ -477,7 +469,6 @@ include $base_path . "PHP/header.php";
                     </div>
                 </div>
 
-                <!-- BENEFÍCIOS COM ÍCONES CRIATIVOS -->
                 <div class="section-title">
                     <h2>Benefícios para Seu Pet</h2>
                 </div>
@@ -489,7 +480,6 @@ include $base_path . "PHP/header.php";
                     <li><i class="fas fa-medal"></i><span>Manutenção regular promove longevidade e saúde geral.</span></li>
                 </ul>
 
-                <!-- PROCESSO -->
                 <div class="section-title">
                     <h2>Nosso Processo de Atendimento</h2>
                 </div>
@@ -512,7 +502,6 @@ include $base_path . "PHP/header.php";
                     </div>
                 </div>
 
-                <!-- CUIDADOS PÓS-SERVIÇO COM BOTÃO CORRIGIDO -->
                 <div class="cta-final">
                     <h3>Cuidados Pós-Serviço</h3>
                     <p>Recomendamos escovação diária em casa e agendamentos regulares a cada 30-45 dias. Nossa equipe fornece orientações personalizadas para manter a higiene entre as visitas.</p>

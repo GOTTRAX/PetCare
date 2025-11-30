@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'conexao.php'; // Conexão com o banco
+include 'conexao.php'; 
 
 /* ===============================
    ATUALIZAR USUÁRIO (POST)

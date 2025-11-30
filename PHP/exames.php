@@ -2,16 +2,13 @@
 ob_start();
 session_start();
 
-// Security headers
 header('X-Frame-Options: DENY');
 header('X-XSS-Protection: 1; mode=block');
 header('X-Content-Type-Options: nosniff');
 
-// Acesso PÚBLICO - Não exige login
 $usuario_logado = isset($_SESSION["id"]) && $_SESSION["tipo_usuario"] === "Cliente";
-$base_path = "/Bruno/PetCare/"; // Ajuste conforme sua estrutura
+$base_path = "/Bruno/PetCare/"; 
 
-// Generate CSRF token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -313,7 +310,6 @@ require_once 'conexao.php';
     <?php include 'header.php'; ?>
 
     <main>
-        <!-- Page Header -->
         <section class="page-header">
             <div class="page-header-content">
                 <span class="tag">Diagnósticos de Excelência</span>
@@ -322,7 +318,6 @@ require_once 'conexao.php';
             </div>
         </section>
 
-        <!-- About Section -->
         <section class="about-section">
             <div class="about-container">
                 <div class="about-content">
@@ -351,7 +346,6 @@ require_once 'conexao.php';
             </div>
         </section>
 
-        <!-- Exames Section -->
         <section class="exames-section">
             <div class="exames-container">
                 <span class="tag">Nossos Exames</span>
@@ -451,10 +445,7 @@ require_once 'conexao.php';
                 </div>
             </div>
         </section>
-
-       
-
-        <!-- CTA -->
+        
         <section class="cta-section">
             <div class="cta-content">
                 <h2>Precisa Agendar um Exame?</h2>

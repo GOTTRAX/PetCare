@@ -1264,8 +1264,11 @@ if ($eh_admin && $tipo_usuario === 'Secretaria') {
             const servicoSelect = document.getElementById('servico_id');
             const horariosSelect = document.getElementById('horarios');
 
+            // LIMPA seleção atual durante o carregamento
+            horariosSelect.innerHTML = '<option value="">Carregando horários...</option>';
+            horariosSelect.disabled = true;
+
             if (!dataInput.value || !servicoSelect.value) {
-                horariosSelect.disabled = true;
                 horariosSelect.innerHTML = '<option value="">Selecione uma data e serviço</option>';
                 document.getElementById('btn-submit').disabled = true;
                 return;
@@ -1446,32 +1449,138 @@ if ($eh_admin && $tipo_usuario === 'Secretaria') {
                         info.el.title = disponibilidade.nome;
                     }
                 },
-                eventClick: (info) => {
+                eventClick: async (info) => {
                     const event = info.event;
                     const props = event.extendedProps;
 
+                    // Define modo de edição
                     formulario.modo = 'editar';
                     formulario.agendamentoId = event.id;
 
+                    // Limpa e reseta o formulário primeiro
+                    document.getElementById('formAgendamento').reset();
+
+                    // Preenche campos básicos
                     document.getElementById('agendamento_id').value = event.id;
                     document.getElementById('data').value = event.startStr.split('T')[0];
-                    document.getElementById('horarios').value = event.startStr.split('T')[1]?.slice(0, 5);
                     document.getElementById('observacoes').value = props.observacoes || '';
 
-                    if (CONFIG.ehAdmin) {
-                        document.getElementById('status').value = props.status || 'pendente';
-                    }
-
-                    if (CONFIG.ehCliente) {
-                        document.querySelector(`[data-id="${props.animal_id}"]`)?.classList.add('selected');
-                        document.getElementById('animal_id').value = props.animal_id;
-                    }
-
+                    // Muda título e botões IMEDIATAMENTE
                     document.getElementById('form-titulo').textContent = 'Editar Agendamento';
                     document.getElementById('botoes-novo').style.display = 'none';
                     document.getElementById('botoes-edicao').style.display = 'flex';
 
-                    document.querySelector('.card:nth-child(2)').scrollIntoView({ behavior: 'smooth' });
+                    // ========== CORREÇÃO: PREENCHE SERVIÇO PRIMEIRO ==========
+                    const servicoSelect = document.getElementById('servico_id');
+                    if (props.servico_id) {
+                        servicoSelect.value = props.servico_id;
+
+                        // Aguarda um pouco para o DOM atualizar
+                        await new Promise(resolve => setTimeout(resolve, 100));
+
+                        // Atualiza info de preço
+                        atualizarInfoPreco();
+                    }
+
+                    // ========== CORREÇÃO: PARA CLIENTE ==========
+                    if (CONFIG.ehCliente) {
+                        // Remove seleção anterior
+                        document.querySelectorAll('.animal-card').forEach(card => {
+                            card.classList.remove('selected');
+                        });
+
+                        // Seleciona o animal correto
+                        const animalCard = document.querySelector(`[data-id="${props.animal_id}"]`);
+                        if (animalCard) {
+                            animalCard.classList.add('selected');
+                            document.getElementById('animal_id').value = props.animal_id;
+                        }
+                    }
+
+                    // ========== CORREÇÃO: PARA ADMIN ==========
+                    if (CONFIG.ehAdmin) {
+                        // Preenche cliente primeiro
+                        const clienteSelect = document.getElementById('cliente_id');
+                        if (props.cliente_id) {
+                            clienteSelect.value = props.cliente_id;
+
+                            // Aguarda carregamento dos animais
+                            await new Promise(resolve => setTimeout(resolve, 300));
+
+                            // Dispara evento change para carregar animais
+                            const changeEvent = new Event('change');
+                            clienteSelect.dispatchEvent(changeEvent);
+
+                            // Aguarda mais tempo para animais carregarem
+                            await new Promise(resolve => setTimeout(resolve, 500));
+
+                            // Agora seleciona o animal
+                            const animalSelect = document.getElementById('animal_id');
+                            if (props.animal_id) {
+                                // Aguarda até o animal estar disponível no select
+                                let tentativas = 0;
+                                const esperarAnimal = setInterval(() => {
+                                    const option = animalSelect.querySelector(`option[value="${props.animal_id}"]`);
+                                    if (option || tentativas > 10) {
+                                        clearInterval(esperarAnimal);
+                                        if (option) {
+                                            animalSelect.value = props.animal_id;
+                                        }
+                                    }
+                                    tentativas++;
+                                }, 100);
+                            }
+                        }
+
+                        // Preenche status
+                        const statusSelect = document.getElementById('status');
+                        if (props.status) {
+                            statusSelect.value = props.status;
+                        }
+                    }
+
+                    // ========== CORREÇÃO: CARREGA HORÁRIOS POR ÚLTIMO ==========
+                    await new Promise(resolve => setTimeout(resolve, 800));
+
+                    // Carrega horários disponíveis
+                    await carregarHorarios();
+
+                    // Aguarda horários carregarem
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    // ========== CORREÇÃO: SELECIONA HORÁRIO CORRETO ==========
+                    const horariosSelect = document.getElementById('horarios');
+                    const horaInicio = event.startStr.split('T')[1]?.slice(0, 8);
+
+                    if (horaInicio && horariosSelect) {
+                        // Aguarda opções estarem disponíveis
+                        let tentativas = 0;
+                        const esperarHorario = setInterval(() => {
+                            const option = horariosSelect.querySelector(`option[value="${horaInicio}"]`);
+                            if (option || tentativas > 15) {
+                                clearInterval(esperarHorario);
+                                if (option) {
+                                    horariosSelect.value = horaInicio;
+
+                                    // Define hora_final
+                                    const horaFinal = props.hora_final || event.endStr?.split('T')[1]?.slice(0, 8);
+                                    if (horaFinal) {
+                                        document.getElementById('hora_final').value = horaFinal;
+                                    }
+                                }
+                            }
+                            tentativas++;
+                        }, 100);
+                    }
+
+                    // Habilita botão de salvar
+                    document.getElementById('btn-submit').disabled = false;
+
+                    // Scroll suave até o formulário
+                    document.querySelector('.card:nth-child(2)').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 },
                 dateClick: (info) => {
                     const dataStr = formatarDataLocal(info.date);

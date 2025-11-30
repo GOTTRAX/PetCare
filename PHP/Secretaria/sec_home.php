@@ -58,7 +58,8 @@ $proximos_agendamentos = [];
 
 try {
     // Total de usuários
-    $query_usuarios = "SELECT COUNT(*) as total FROM Usuarios WHERE ativo = TRUE";
+    $query_usuarios = "SELECT COUNT(*) as total FROM Usuarios WHERE ativo = TRUE AND tipo_usuario = 'Cliente'";
+
     $result = $pdo->query($query_usuarios);
     if ($result) {
         $usuarios = $result->fetch(PDO::FETCH_ASSOC);

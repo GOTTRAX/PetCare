@@ -19,7 +19,7 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
   <link rel="stylesheet" href="../Estilos/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <title>Vacinação - PetCare</title>
-  <?php include '../PHP/header.php';?>
+  <?php include '../PHP/header.php'; ?>
   <style>
     :root {
       --primary: #2E8B57;
@@ -166,7 +166,7 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
       direction: rtl;
     }
 
-    .timeline-item:nth-child(even) > * {
+    .timeline-item:nth-child(even)>* {
       direction: ltr;
     }
 
@@ -495,6 +495,7 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
     }
 
     @media (max-width: 480px) {
+
       .service-image,
       .timeline-image {
         height: 220px;
@@ -613,7 +614,8 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
             <i class="fas fa-user-md"></i>
           </div>
           <h4>Avaliação Veterinária de Excelência</h4>
-          <p>Antes de qualquer vacina, realizamos exames completos para garantir que seu pet está pronto para a imunização</p>
+          <p>Antes de qualquer vacina, realizamos exames completos para garantir que seu pet está pronto para a
+            imunização</p>
           <span class="highlight">Check-up detalhado em cada visita</span>
         </div>
 
@@ -659,11 +661,13 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
         <div class="timeline-item">
           <div class="timeline-content">
             <h3>Avaliação Inicial (30–45 dias)</h3>
-            <p>Uma consulta inicial detalhada avalia a saúde do seu pet, preparando-o para o início do protocolo de vacinação.</p>
+            <p>Uma consulta inicial detalhada avalia a saúde do seu pet, preparando-o para o início do protocolo de
+              vacinação.</p>
           </div>
           <div class="timeline-dot"></div>
           <div class="timeline-image">
-            <img src="https://i.pinimg.com/736x/d4/87/60/d487603c9eb2b66db2e4271255a7d403.jpg" alt="Consulta inicial" loading="lazy">
+            <img src="https://i.pinimg.com/736x/d4/87/60/d487603c9eb2b66db2e4271255a7d403.jpg" alt="Consulta inicial"
+              loading="lazy">
             <p class="img-caption">Consulta inicial com um filhote</p>
           </div>
         </div>
@@ -671,11 +675,13 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
         <div class="timeline-item">
           <div class="timeline-content">
             <h3>Primeiros Dias (45–60 dias)</h3>
-            <p>Iniciamos com vacinas V8/V10 (cães), contra cinomose e parvovirose, e V3–V5 (gatos), contra rinotraqueíte e calicivirose.</p>
+            <p>Iniciamos com vacinas V8/V10 (cães), contra cinomose e parvovirose, e V3–V5 (gatos), contra rinotraqueíte
+              e calicivirose.</p>
           </div>
           <div class="timeline-dot"></div>
           <div class="timeline-image">
-            <img src="https://i.pinimg.com/736x/85/d5/44/85d5440fa384d38db4aa23158cdeae63.jpg" alt="Primeira vacina" loading="lazy">
+            <img src="https://i.pinimg.com/736x/85/d5/44/85d5440fa384d38db4aa23158cdeae63.jpg" alt="Primeira vacina"
+              loading="lazy">
             <p class="img-caption">Primeira vacina para filhotes</p>
           </div>
         </div>
@@ -687,7 +693,8 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
           </div>
           <div class="timeline-dot"></div>
           <div class="timeline-image">
-            <img src="https://i.pinimg.com/736x/ec/9d/d5/ec9dd55a1f5676757da765d9b2d01679.jpg" alt="Reforços" loading="lazy">
+            <img src="https://i.pinimg.com/736x/ec/9d/d5/ec9dd55a1f5676757da765d9b2d01679.jpg" alt="Reforços"
+              loading="lazy">
             <p class="img-caption">Consulta para reforços iniciais</p>
           </div>
         </div>
@@ -695,11 +702,13 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
         <div class="timeline-item">
           <div class="timeline-content">
             <h3>Antirrábica (12 semanas)</h3>
-            <p>A vacina antirrábica é aplicada a partir de 12 semanas, essencial para a segurança do pet e da comunidade.</p>
+            <p>A vacina antirrábica é aplicada a partir de 12 semanas, essencial para a segurança do pet e da
+              comunidade.</p>
           </div>
           <div class="timeline-dot"></div>
           <div class="timeline-image">
-            <img src="https://i.pinimg.com/1200x/f6/fc/2d/f6fc2dec181e6b4c183952d15b1620ec.jpg" alt="Antirrábica" loading="lazy">
+            <img src="https://i.pinimg.com/1200x/f6/fc/2d/f6fc2dec181e6b4c183952d15b1620ec.jpg" alt="Antirrábica"
+              loading="lazy">
             <p class="img-caption">Proteção contra raiva</p>
           </div>
         </div>
@@ -707,11 +716,13 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
         <div class="timeline-item">
           <div class="timeline-content">
             <h3>Manutenção Anual</h3>
-            <p>Reforços anuais e vacinas opcionais, como gripe canina para cães ou FeLV para gatos, ajustados ao estilo de vida do seu pet.</p>
+            <p>Reforços anuais e vacinas opcionais, como gripe canina para cães ou FeLV para gatos, ajustados ao estilo
+              de vida do seu pet.</p>
           </div>
           <div class="timeline-dot"></div>
           <div class="timeline-image">
-            <img src="https://i.pinimg.com/736x/29/60/22/29602249f0f4e15fa1b692a917b19128.jpg" alt="Manutenção" loading="lazy">
+            <img src="https://i.pinimg.com/736x/29/60/22/29602249f0f4e15fa1b692a917b19128.jpg" alt="Manutenção"
+              loading="lazy">
             <p class="img-caption">Manutenção para pets adultos</p>
           </div>
         </div>
@@ -719,11 +730,13 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
         <div class="timeline-item">
           <div class="timeline-content">
             <h3>Monitoramento Contínuo</h3>
-            <p>Consultas regulares garantem que o plano de vacinação permanece atualizado, adaptado às necessidades do seu pet.</p>
+            <p>Consultas regulares garantem que o plano de vacinação permanece atualizado, adaptado às necessidades do
+              seu pet.</p>
           </div>
           <div class="timeline-dot"></div>
           <div class="timeline-image">
-            <img src="https://i.pinimg.com/1200x/6e/e2/34/6ee23404e8415eac4ba4a24a8ae0b468.jpg" alt="Monitoramento" loading="lazy">
+            <img src="https://i.pinimg.com/1200x/6e/e2/34/6ee23404e8415eac4ba4a24a8ae0b468.jpg" alt="Monitoramento"
+              loading="lazy">
             <p class="img-caption">Acompanhamento contínuo</p>
           </div>
         </div>
@@ -731,11 +744,13 @@ $tipo = $_SESSION['tipo_usuario'] ?? null;
         <div class="timeline-item">
           <div class="timeline-content">
             <h3>Cuidados Personalizados</h3>
-            <p>Adaptamos o plano ao estilo de vida do seu pet, como vacinas para gripe canina para quem frequenta creches ou FeLV para gatos.</p>
+            <p>Adaptamos o plano ao estilo de vida do seu pet, como vacinas para gripe canina para quem frequenta
+              creches ou FeLV para gatos.</p>
           </div>
           <div class="timeline-dot"></div>
           <div class="timeline-image">
-            <img src="https://i.pinimg.com/736x/ad/20/26/ad2026bf8333049f6167a3767bcc8293.jpg" alt="Personalização" loading="lazy">
+            <img src="https://i.pinimg.com/736x/ad/20/26/ad2026bf8333049f6167a3767bcc8293.jpg" alt="Personalização"
+              loading="lazy">
             <p class="img-caption">Saúde e felicidade garantidas</p>
           </div>
         </div>

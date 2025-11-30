@@ -214,7 +214,7 @@ include "PHP/header.php";
                 <p>Oferecemos atendimento veterinário de qualidade com uma equipe de profissionais dedicados ao
                     bem-estar do seu pet.</p>
                 <div class="buttons">
-                    <a href="consultas.php" class="btn primary">Agendar Consulta</a>
+                    <a href="PHP/Calendario/calendario.php" class="btn primary">Agendar Consulta</a>
                     <a href="https://wa.me/5518996931805?text=Ol%C3%A1%2C%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20os%20servi%C3%A7os."
                        class="btn btn-whatsapp" target="_blank" rel="noopener noreferrer">
                         <i class="fab fa-whatsapp"></i> Fale no WhatsApp
